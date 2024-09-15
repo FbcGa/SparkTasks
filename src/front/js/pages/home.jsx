@@ -7,47 +7,60 @@ export const Home = () => {
   const postID = useId();
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    setPosts([...posts, inputRef.current.value]);
-    inputRef.current.value = "";
+    if (event.key === "Enter") {
+      event.preventDefault();
+      setPosts([...posts, inputRef.current.value]);
+      inputRef.current.value = "";
+    }
   };
 
   return (
-    <div className="bg-secondary mt-5" style={{ width: "300px" }}>
-      <div className="d-flex justify-content-between align-items-center">
-        <h5 className="m-0 mx-2 p-0">To Do</h5>
-        <button className="btn btn-primary">
-          <i className="fa-solid fa-ellipsis"></i>
-        </button>
-      </div>
+    <main
+      className="mt-5 p-1"
+      style={{ width: "300px", background: "rgb(91, 153, 194)" }}
+    >
+      <div className="d-flex flex-column">
+        <section className="m-0 p-0 d-flex justify-content-between align-items-center">
+          <h5 className="m-0 mx-2 p-0 fs-2 fw-semibold font-monospace">
+            To Do
+          </h5>
+          <button className="btn">
+            <i className="fa-solid fa-ellipsis"></i>
+          </button>
+        </section>
 
-      {postState === true ? (
-        <form className="mx-1" onSubmit={handleSubmit}>
-          <textarea
-            className="form-control"
-            id="exampleFormControlTextarea1"
-            rows="2"
-            ref={inputRef}
-          ></textarea>
-          <button type="submit">Save</button>
-        </form>
-      ) : null}
+        {posts.length > 0
+          ? posts.map((post, index) => (
+              <p
+                key={`${postID}-${index}`}
+                className="fs-5 font-monospace mx-2 ps-2 border border-black"
+              >
+                {post}
+              </p> // Generar una key única
+            ))
+          : null}
+        {postState === true ? (
+          <form className="mx-1">
+            <textarea
+              className="form-control"
+              id="exampleFormControlTextarea1"
+              rows="2"
+              ref={inputRef}
+              onKeyDown={handleSubmit}
+            ></textarea>
+          </form>
+        ) : null}
 
-      {posts.length > 0 ? (
-        posts.map((post, index) => (
-          <h1 key={`${postID}-${index}`}>{post}</h1> // Generar una key única
-        ))
-      ) : (
-        <div>
+        <div className="ps-1">
           <button
-            className="btn btn-primary"
+            className="btn btn-primary d-flex align-items-center gap-2"
             onClick={() => setPostState(true)}
           >
             <i className="fa-solid fa-plus"></i>
             <span>Add a card</span>
           </button>
         </div>
-      )}
-    </div>
+      </div>
+    </main>
   );
 };

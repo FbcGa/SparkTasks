@@ -33,7 +33,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-body: #202b38;
+    --background-body: rgb(31, 49, 111);
     --background: #161f27;
     --background-alt: #1a242f;
     --selection: #1c76c5;
