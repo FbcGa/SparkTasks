@@ -1,9 +1,14 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
 import ListFromUser from "../mocks/lists.json";
+import "../../styles/home.css";
 
 export const Home = () => {
   const [postState, setPostState] = useState(false);
+  const { store, actions } = useContext(Context);
   const inputRef = useRef();
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     if (event.key === "Enter") {
@@ -11,16 +16,23 @@ export const Home = () => {
       inputRef.current.value = "";
     }
   };
-  const renderList = ListFromUser.lists;
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/register");
+    }
+    actions.allList();
+  }, []);
   return (
-    <main>
-      {renderList?.map((list) => (
-        <div
-          className="mt-5 p-1"
-          style={{ width: "300px", background: "rgb(91, 153, 194)" }}
-          key={list.id}
-        >
-          <div className="d-flex flex-column">
+    <main className="container">
+      <ul className="row list-unstyled gap-4 mt-5">
+        {store.list?.map((list) => (
+          <li
+            className="col-sm-6 col-md-4 col-lg-3"
+            style={{ width: "300px", background: "rgb(91, 153, 194)" }}
+            key={list.id}
+          >
             <section className="m-0 p-0 d-flex justify-content-between align-items-center">
               <h5 className="m-0 mx-2 p-0 fs-2 fw-semibold font-monospace">
                 {list.title}
@@ -52,7 +64,7 @@ export const Home = () => {
               </form>
             ) : null}
 
-            <div className="ps-1">
+            <section className="ps-1">
               <button
                 className="btn btn-primary d-flex align-items-center gap-2"
                 onClick={() => setPostState(true)}
@@ -60,10 +72,10 @@ export const Home = () => {
                 <i className="fa-solid fa-plus"></i>
                 <span>Add a card</span>
               </button>
-            </div>
-          </div>
-        </div>
-      ))}
+            </section>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 };
