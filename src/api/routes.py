@@ -121,7 +121,7 @@ def delete_list():
         return jsonify({"mssg": "list delete successfully"}),200
     except Exception as error:
         return jsonify({"error": f"{error}"}), 500 
-    
+        
 #----------------------------------------------------------------------------------------    
 @api.route('/task', methods=['POST'])
 @jwt_required()

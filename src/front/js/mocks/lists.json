@@ -1,0 +1,72 @@
+{
+    "lists": [
+        {
+            "id": 7,
+            "tasks": [
+                {
+                    "id": 3,
+                    "list_id": 7,
+                    "text": "go gym"
+                },
+                {
+                    "id": 4,
+                    "list_id": 7,
+                    "text": "take out the garbage"
+                },
+                {
+                    "id": 5,
+                    "list_id": 7,
+                    "text": "cook"
+                }
+            ],
+            "title": "to Do"
+        },
+        {
+            "id": 8,
+            "tasks": [
+                {
+                    "id": 6,
+                    "list_id": 8,
+                    "text": "dotear"
+                },
+                {
+                    "id": 7,
+                    "list_id": 8,
+                    "text": "compar pan"
+                },
+                {
+                    "id": 8,
+                    "list_id": 8,
+                    "text": "ver tv"
+                }
+            ],
+            "title": "pending"
+        },
+        {
+            "id": 9,
+            "tasks": [
+                {
+                    "id": 9,
+                    "list_id": 9,
+                    "text": "almorzar"
+                },
+                {
+                    "id": 10,
+                    "list_id": 9,
+                    "text": "dormir"
+                },
+                {
+                    "id": 11,
+                    "list_id": 9,
+                    "text": "estudiar"
+                }
+            ],
+            "title": "Done"
+        },
+        {
+            "id": 10,
+            "tasks": [],
+            "title": "Done"
+        }
+    ]
+}
