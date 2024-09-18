@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 
 export function Register() {
-  const { store, actions } = useContext(Context);
+  const { actions } = useContext(Context);
   const emailRef = useRef();
   const passwordRef = useRef();
 

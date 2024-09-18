@@ -92,6 +92,24 @@ const getState = ({ getStore, getActions, setStore }) => {
         const data = await resp.json();
         setStore({ list: data.lists });
       },
+      addNewList: async () => {
+        const token = localStorage.getItem("token");
+        const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title }),
+        });
+        if (!resp.ok) {
+          return false;
+        }
+        const data = await resp.json();
+        setStore({ user: data.user });
+        localStorage.setItem("token", data.auth);
+        return data;
+      },
     },
   };
 };

@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
-import ListFromUser from "../mocks/lists.json";
 import "../../styles/home.css";
 
 export const Home = () => {
@@ -9,6 +8,8 @@ export const Home = () => {
   const { store, actions } = useContext(Context);
   const inputRef = useRef();
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
 
   const handleSubmit = (event) => {
     if (event.key === "Enter") {
@@ -18,12 +19,12 @@ export const Home = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/register");
+      navigate("/login");
     }
     actions.allList();
-  }, []);
+  }, [token]);
+
   return (
     <main className="container">
       <ul className="row list-unstyled gap-4 mt-5">
