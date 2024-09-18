@@ -92,7 +92,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         const data = await resp.json();
         setStore({ list: data.lists });
       },
-      addNewList: async () => {
+      addList: async () => {
         const token = localStorage.getItem("token");
         const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
           method: "POST",
@@ -107,7 +107,22 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
         const data = await resp.json();
         setStore({ user: data.user });
-        localStorage.setItem("token", data.auth);
+        return data;
+      },
+      addTask: async (text, listId) => {
+        const token = localStorage.getItem("token");
+        const resp = await fetch(process.env.BACKEND_URL + "/api/task", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ text: text, list_id: listId }),
+        });
+        if (!resp.ok) {
+          return false;
+        }
+        const data = await resp.json();
         return data;
       },
     },

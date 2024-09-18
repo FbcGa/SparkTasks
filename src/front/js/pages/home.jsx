@@ -11,9 +11,10 @@ export const Home = () => {
 
   const token = localStorage.getItem("token");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event, id) => {
     if (event.key === "Enter") {
       event.preventDefault();
+      const resp = await actions.addTask(inputRef.current.value, id);
       inputRef.current.value = "";
     }
   };
@@ -23,7 +24,7 @@ export const Home = () => {
       navigate("/login");
     }
     actions.allList();
-  }, [token]);
+  }, []);
 
   return (
     <main className="container">
@@ -60,7 +61,7 @@ export const Home = () => {
                   id="exampleFormControlTextarea1"
                   rows="2"
                   ref={inputRef}
-                  onKeyDown={handleSubmit}
+                  onKeyDown={() => handleSubmit(event, list.id)}
                 ></textarea>
               </form>
             ) : null}
