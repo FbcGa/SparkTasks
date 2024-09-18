@@ -92,9 +92,10 @@ const getState = ({ getStore, getActions, setStore }) => {
         const data = await resp.json();
         setStore({ list: data.lists });
       },
-      addList: async () => {
+      addList: async (title) => {
+        const store = getStore();
         const token = localStorage.getItem("token");
-        const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+        const resp = await fetch(process.env.BACKEND_URL + "/api/list", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -106,10 +107,19 @@ const getState = ({ getStore, getActions, setStore }) => {
           return false;
         }
         const data = await resp.json();
-        setStore({ user: data.user });
+        setStore({
+          list: [
+            ...store.list,
+            {
+              ...data.list,
+            },
+          ],
+        });
         return data;
       },
       addTask: async (text, listId) => {
+        console.log(text, listId);
+        const store = getStore();
         const token = localStorage.getItem("token");
         const resp = await fetch(process.env.BACKEND_URL + "/api/task", {
           method: "POST",

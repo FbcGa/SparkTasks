@@ -1,33 +1,31 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/authUser";
 import "../../styles/home.css";
 
 export const Home = () => {
   const [postState, setPostState] = useState(false);
+  const [createList, setCreateList] = useState(false);
   const { store, actions } = useContext(Context);
-  const inputRef = useRef();
-  const navigate = useNavigate();
+  const addTaskRef = useRef();
+  const addListRef = useRef();
 
-  const token = localStorage.getItem("token");
+  useAuth();
 
-  const handleSubmit = async (event, id) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      const resp = await actions.addTask(inputRef.current.value, id);
-      inputRef.current.value = "";
-    }
+  const addTasks = async (id) => {
+    const text = addTaskRef.current.value;
+    console.log(text);
+    await actions.addTask(text, id);
   };
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-    }
-    actions.allList();
-  }, []);
+  const addLists = async () => {
+    const title = addListRef.current.value;
+    await actions.addList(title);
+    setCreateList(false);
+  };
 
   return (
-    <main className="container">
+    <main className="container d-flex gap-5">
       <ul className="row list-unstyled gap-4 mt-5">
         {store.list?.map((list) => (
           <li
@@ -51,19 +49,22 @@ export const Home = () => {
                     className="fs-5 font-monospace mx-2 ps-2 border border-black"
                   >
                     {task.text}
-                  </p> // Generar una key única
+                  </p>
                 ))
               : null}
             {postState === true ? (
-              <form className="mx-1">
+              <div className="form-floating">
                 <textarea
                   className="form-control"
-                  id="exampleFormControlTextarea1"
-                  rows="2"
-                  ref={inputRef}
-                  onKeyDown={() => handleSubmit(event, list.id)}
+                  id="floatingTextarea1"
+                  ref={addTaskRef}
                 ></textarea>
-              </form>
+                <label htmlFor="floatingTextarea1">Write a task</label>
+                <button onClick={() => addTasks(list.id)}>
+                  <i className="fa-solid fa-plus"></i>
+                  <span>Add a taks</span>
+                </button>
+              </div>
             ) : null}
 
             <section className="ps-1">
@@ -72,12 +73,37 @@ export const Home = () => {
                 onClick={() => setPostState(true)}
               >
                 <i className="fa-solid fa-plus"></i>
-                <span>Add a card</span>
+                <span>Add a Task</span>
               </button>
             </section>
           </li>
         ))}
       </ul>
+
+      <section className="ps-1 mt-5">
+        {createList ? (
+          <div className="form-floating">
+            <textarea
+              className="form-control"
+              id="floatingTextarea"
+              ref={addListRef}
+            ></textarea>
+            <label htmlFor="floatingTextarea">Write a title</label>
+            <button onClick={addLists}>
+              <i className="fa-solid fa-plus"></i>
+              <span>Add a List</span>
+            </button>
+          </div>
+        ) : (
+          <button
+            className="btn btn-primary d-flex align-items-center gap-2"
+            onClick={() => setCreateList(true)}
+          >
+            <i className="fa-solid fa-plus"></i>
+            <span>Add a List</span>
+          </button>
+        )}
+      </section>
     </main>
   );
 };

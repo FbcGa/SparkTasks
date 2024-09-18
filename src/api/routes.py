@@ -83,7 +83,7 @@ def add_list():
         db.session.add(new_list)
         db.session.commit()
         db.session.refresh(new_list)
-        return jsonify({"mssg": "list create successfully"}),200
+        return jsonify({"mssg": "list create successfully", "list": new_list.serialize()}),200
     except Exception as error:
         db.session.rollback()
         return jsonify({"error": f"{error}"}), 500
@@ -142,7 +142,7 @@ def add_task():
         db.session.add(new_task)
         db.session.commit()
         db.session.refresh(new_task)
-        return jsonify({"mssg": "task add successfully"}),200
+        return jsonify({"mssg": "task add successfully", "task": new_task.serialize()}),200
     except Exception as error:
         db.session.rollback()
         return jsonify({"error": f"{error}"}), 500
