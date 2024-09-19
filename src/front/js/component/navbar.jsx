@@ -7,15 +7,13 @@ export const Navbar = () => {
   const isLogged = (token) => {
     if (token) {
       return (
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <button className="btn btn-link nav-link" onClick={handleSignIn}>
-                <i className="fa-solid fa-right-to-bracket"></i>
-              </button>
-            </li>
-          </ul>
-        </div>
+        <ul className="navbar-nav ms-auto">
+          <li className="nav-item">
+            <button className="btn btn-link nav-link" onClick={handleSignIn}>
+              <i className="fa-solid fa-right-to-bracket"></i>
+            </button>
+          </li>
+        </ul>
       );
     }
     return;
@@ -28,11 +26,11 @@ export const Navbar = () => {
 
   return (
     <nav className="navbar navbar-expand-md navbar-light bg-light">
-      <Link className="navbar-brand" to="/">
+      <Link className="navbar-brand ms-3" to="/">
         <span>Trello</span>
       </Link>
       <button
-        className="navbar-toggler"
+        className="navbar-toggler "
         type="button"
         data-toggle="collapse"
         data-target="#navbarSupportedContent"

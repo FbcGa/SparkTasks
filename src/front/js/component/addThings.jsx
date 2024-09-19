@@ -19,7 +19,7 @@ export function AddThings({ textItem, id }) {
   };
 
   return (
-    <section>
+    <section style={{ width: "280px" }}>
       {item ? (
         <div className="form-floating">
           <textarea

@@ -14,12 +14,11 @@ export const Home = () => {
   };
 
   const deleteTask = async (id, listId) => {
-    const resp = await actions.deleteTask(id, listId);
-    console.log(resp);
+    await actions.deleteTask(id, listId);
   };
   return (
-    <main className="container">
-      <ul className="row list-unstyled gap-4 mt-5">
+    <main className="container d-flex mt-5 gap-5">
+      <ul className="row list-unstyled gap-4">
         {store.list?.map((list) => (
           <li
             className="col-sm-6 col-md-4 col-lg-3"
@@ -40,8 +39,12 @@ export const Home = () => {
                   <i className="fa-solid fa-ellipsis"></i>
                 </button>
                 <ul className="dropdown-menu">
-                  <li>
-                    <button onClick={() => deleteList(list.id)}>
+                  <li className="d-flex justify-content-center">
+                    <button
+                      type="button"
+                      onClick={() => deleteList(list.id)}
+                      className="d-flex flex-grow-1 gap-2 align-items-center btn-outline-danger"
+                    >
                       <i className="fa-solid fa-trash"></i>
                       <span>Delete</span>
                     </button>
@@ -52,20 +55,26 @@ export const Home = () => {
 
             {list.tasks?.length > 0
               ? list.tasks.map((task) => (
-                  <div key={task.id} className="d-flex">
-                    <p className="flex-grow-1 fs-5 font-monospace mx-2 ps-2 border border-black span-3">
+                  <div
+                    key={task.id}
+                    className="d-flex justify-content-between align-items-center p-2"
+                  >
+                    <div className="flex-grow-1 fs-5 font-monospace border border-black ps-2">
                       {task.text}
-                    </p>
+                    </div>
                     <button
+                      type="button"
                       onClick={() => deleteTask(task.id, list.id)}
-                      className="m-0"
+                      className="btn btn-danger btn-sm m-0"
                     >
                       <i className="fa-solid fa-trash"></i>
                     </button>
                   </div>
                 ))
               : null}
-            <AddThings textItem="Task" id={list.id} />
+            <div className="pt-2">
+              <AddThings textItem="Task" id={list.id} />
+            </div>
           </li>
         ))}
       </ul>
