@@ -14,8 +14,8 @@ export const Home = () => {
 
   const addTasks = async (id) => {
     const text = addTaskRef.current.value;
-    console.log(text);
     await actions.addTask(text, id);
+    addTaskRef.current.value = "";
   };
 
   const addLists = async () => {

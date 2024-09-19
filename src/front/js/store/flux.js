@@ -118,7 +118,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         return data;
       },
       addTask: async (text, listId) => {
-        console.log(text, listId);
         const store = getStore();
         const token = localStorage.getItem("token");
         const resp = await fetch(process.env.BACKEND_URL + "/api/task", {
@@ -133,6 +132,13 @@ const getState = ({ getStore, getActions, setStore }) => {
           return false;
         }
         const data = await resp.json();
+
+        const newTask = store.list.map((list) =>
+          list.id === data.task.list_id
+            ? { ...list, tasks: [...list.tasks, { ...data.task }] }
+            : list
+        );
+        setStore({ list: newTask });
         return data;
       },
     },
