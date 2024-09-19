@@ -1,11 +1,12 @@
 import React, { useRef, useContext } from "react";
 import { Context } from "../store/appContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export function Register() {
   const { actions } = useContext(Context);
   const emailRef = useRef();
   const passwordRef = useRef();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

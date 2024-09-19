@@ -117,6 +117,25 @@ const getState = ({ getStore, getActions, setStore }) => {
         });
         return data;
       },
+      deleteList: async (id) => {
+        const token = localStorage.getItem("token");
+        const store = getStore();
+        const resp = await fetch(process.env.BACKEND_URL + "/api/list/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id }),
+        });
+        if (!resp.ok) {
+          return false;
+        }
+        const data = await resp.json();
+        const filterList = store.list.filter((list) => list.id !== id);
+        setStore({ list: filterList });
+        return data;
+      },
       addTask: async (text, listId) => {
         const store = getStore();
         const token = localStorage.getItem("token");
@@ -139,6 +158,33 @@ const getState = ({ getStore, getActions, setStore }) => {
             : list
         );
         setStore({ list: newTask });
+        return data;
+      },
+      deleteTask: async (id, listId) => {
+        const token = localStorage.getItem("token");
+        const store = getStore();
+        const resp = await fetch(process.env.BACKEND_URL + "/api/task/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ id, listId }),
+        });
+        if (!resp.ok) {
+          return false;
+        }
+        const data = await resp.json();
+        const deleteTask = store.list.map((list) => {
+          if (list.id === listId) {
+            return {
+              ...list,
+              tasks: list.tasks.filter((task) => task.id !== id),
+            };
+          }
+          return list;
+        });
+        setStore({ list: deleteTask });
         return data;
       },
     },

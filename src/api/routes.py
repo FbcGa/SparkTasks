@@ -153,7 +153,7 @@ def delete_task():
     current_user = get_jwt_identity()
     body = request.json
     task_id = body.get("id", None)
-    list_id = body.get("list_id", None)
+    list_id = body.get("listId", None)
 
     if id is None or list_id is None:
         return jsonify({"error": "parameters are missing"}),404
