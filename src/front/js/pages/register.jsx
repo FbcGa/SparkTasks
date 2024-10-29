@@ -18,43 +18,43 @@ export function Register() {
     }
   };
   return (
-    <section className="d-flex flex-column m-auto align-items-center p-5 mt-5">
-      <form onSubmit={handleSubmit} className="text-black">
-        <div className="mb-3">
-          <h1 className="text-center text-black fw-bold">Register</h1>
-          <label htmlFor="exampleInputEmail1" className="form-label">
+    <section className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <div className="form-group">
+          <h1 className="form-title">Register</h1>
+          <label htmlFor="email" className="form-label">
             Email address
           </label>
           <input
             type="email"
-            className="form-control"
-            id="exampleInputEmail1"
-            aria-describedby="emailHelp"
+            id="email"
             ref={emailRef}
+            className="input-field"
             placeholder="Enter your email"
           />
-          <div id="emailHelp" className="form-text">
+          <div className="form-text">
             We'll never share your email with anyone else.
           </div>
         </div>
-        <div className="mb-3">
-          <label htmlFor="exampleInputPassword1" className="form-label">
+        <div className="form-group">
+          <label htmlFor="password" className="form-label">
             Password
           </label>
           <input
             type="password"
-            className="form-control"
-            id="exampleInputPassword1"
+            id="password"
             ref={passwordRef}
+            className="input-field"
             placeholder="Enter your password"
           />
         </div>
-        <button type="submit" className="btn btn-primary w-100">
+        <button type="submit" className="submit-button">
           Submit
         </button>
       </form>
-      <button type="button" className="btn btn-secondary w-100 mt-3">
-        <Link className="text-white" to={"/login"}>
+
+      <button type="button" className="register-button">
+        <Link to={"/login"} className="register-link">
           If you have an account, click here!!
         </Link>
       </button>
