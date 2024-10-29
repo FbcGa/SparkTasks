@@ -19,15 +19,7 @@ export function Login() {
   };
 
   return (
-    <section
-      className="d-flex flex-column m-auto align-items-center p-5 mt-5"
-      style={{
-        width: "500px",
-        background: "#F7F9FC", // Light gray-blue background
-        borderRadius: "10px",
-        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-      }}
-    >
+    <section className="d-flex flex-column m-auto align-items-center p-5 mt-5">
       <form onSubmit={handleSubmit} className="text-black">
         <div className="mb-3">
           <h1 className="text-center text-black fw-bold">Login</h1>

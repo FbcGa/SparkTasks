@@ -69,10 +69,12 @@ const getState = ({ getStore, getActions, setStore }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         });
+
         if (!resp.ok) {
           return false;
         }
         const data = await resp.json();
+
         setStore({ user: data.user });
         localStorage.setItem("token", data.auth);
         return data;

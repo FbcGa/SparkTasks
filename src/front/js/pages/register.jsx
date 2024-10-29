@@ -18,42 +18,44 @@ export function Register() {
     }
   };
   return (
-    <section>
-      <form onSubmit={handleSubmit}>
+    <section className="d-flex flex-column m-auto align-items-center p-5 mt-5">
+      <form onSubmit={handleSubmit} className="text-black">
         <div className="mb-3">
-          <h1>Register</h1>
-          <label htmlFor="exampleInputEmail1" className="htmlForm-label">
+          <h1 className="text-center text-black fw-bold">Register</h1>
+          <label htmlFor="exampleInputEmail1" className="form-label">
             Email address
           </label>
           <input
             type="email"
-            className="htmlForm-control"
+            className="form-control"
             id="exampleInputEmail1"
             aria-describedby="emailHelp"
             ref={emailRef}
+            placeholder="Enter your email"
           />
-          <div id="emailHelp" className="htmlForm-text">
+          <div id="emailHelp" className="form-text">
             We'll never share your email with anyone else.
           </div>
         </div>
         <div className="mb-3">
-          <label htmlFor="exampleInputPassword1" className="htmlForm-label">
+          <label htmlFor="exampleInputPassword1" className="form-label">
             Password
           </label>
           <input
             type="password"
-            className="htmlForm-control"
+            className="form-control"
             id="exampleInputPassword1"
             ref={passwordRef}
+            placeholder="Enter your password"
           />
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary w-100">
           Submit
         </button>
       </form>
-      <button>
+      <button type="button" className="btn btn-secondary w-100 mt-3">
         <Link className="text-white" to={"/login"}>
-          If you already have an account, click here!!.
+          If you have an account, click here!!
         </Link>
       </button>
     </section>
