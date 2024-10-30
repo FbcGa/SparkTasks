@@ -80,3 +80,182 @@
   display: block;
   text-align: center;
 }
+
+/* Main container */
+.home-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 50px;
+  padding: 20px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* List container */
+.list-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  list-style-type: none;
+  padding: 0;
+}
+
+/* Individual list item */
+.list-item {
+  width: 300px;
+  background-color: rgb(91, 153, 194);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header for each list */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+/* Dropdown styles */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-item {
+  text-align: center;
+  margin: 5px 0;
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: red;
+}
+
+/* Task items */
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.task-text {
+  flex-grow: 1;
+  font-size: 1.2rem;
+  font-family: monospace;
+}
+
+.task-delete-button {
+  background-color: red;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+/* Add task container */
+.add-task-container {
+  padding-top: 10px;
+}
+
+/* Container for the add item section */
+.add-things-container {
+  width: 280px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Input container styles */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Textarea input styles */
+.text-input {
+  width: 100%;
+  height: 60px;
+  resize: none;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: sans-serif;
+}
+
+/* Button for adding the item */
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+/* Button to toggle the input field */
+.toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #008cba;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggle-button:hover {
+  background-color: #007bb5;
+}

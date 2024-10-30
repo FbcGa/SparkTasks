@@ -7,37 +7,34 @@ export function AddThings({ textItem, id }) {
   const addRef = useRef();
 
   const addItem = async () => {
+    const inputValue = addRef.current.value.trim();
+    if (!inputValue) return;
+
     if (id) {
-      const text = addRef.current.value;
-      await actions.addTask(text, id);
+      await actions.addTask(inputValue, id);
     } else {
-      const title = addRef.current.value;
-      await actions.addList(title);
+      await actions.addList(inputValue);
     }
     addRef.current.value = "";
     setItem(false);
   };
 
   return (
-    <section style={{ width: "280px" }}>
+    <section className="add-things-container">
       {item ? (
-        <div className="form-floating">
+        <div className="input-container">
           <textarea
-            className="form-control"
-            id="floatingTextarea"
+            className="text-input"
             ref={addRef}
+            placeholder="Write a title"
           ></textarea>
-          <label htmlFor="floatingTextarea">Write a title</label>
-          <button onClick={addItem}>
+          <button onClick={addItem} className="add-button">
             <i className="fa-solid fa-plus"></i>
-            <span>Add a {textItem} </span>
+            <span>Add a {textItem}</span>
           </button>
         </div>
       ) : (
-        <button
-          className="btn btn-primary d-flex align-items-center gap-2"
-          onClick={() => setItem(true)}
-        >
+        <button className="toggle-button" onClick={() => setItem(true)}>
           <i className="fa-solid fa-plus"></i>
           <span>Add a {textItem}</span>
         </button>
