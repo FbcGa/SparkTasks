@@ -189,6 +189,10 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ list: deleteTask });
         return data;
       },
+      /*----sort list---------------*/
+      sortLists: (newOrder) => {
+        setStore({ list: newOrder });
+      },
     },
   };
 };

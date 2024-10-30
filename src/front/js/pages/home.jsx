@@ -1,73 +1,64 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { Context } from "../store/appContext";
 import { useAuth } from "../hooks/authUser";
 import { AddThings } from "../component/addThings.jsx";
 import "../../styles/home.css";
-import { DndContext } from "@dnd-kit/core";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
+import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import { SortableList } from "../component/sortableList.jsx";
+import { createPortal } from "react-dom";
 
 export const Home = () => {
   const { store, actions } = useContext(Context);
+  const [activeList, setActiveList] = useState([]);
 
+  const ColumnList = useMemo(
+    () => store.list.map((list) => list.id),
+    [store.list]
+  );
+
+  const onDragStart = (event) => {
+    if (event.active.data.current?.list) {
+      setActiveList(event.active.data.current.list);
+    }
+  };
+
+  const onDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeListId = active.id;
+    const overListId = over.id;
+
+    if (activeListId === overListId) return;
+
+    const oldListIndex = store.list.findIndex(
+      (list) => list.id === activeListId
+    );
+    const newListIndex = store.list.findIndex((list) => list.id === overListId);
+    actions.sortLists(arrayMove(store.list, oldListIndex, newListIndex));
+  };
   useAuth();
-
-  const deleteList = async (id) => {
-    await actions.deleteList(id);
-  };
-
-  const deleteTask = async (id, listId) => {
-    await actions.deleteTask(id, listId);
-  };
-
   return (
-    <main className="home-container">
-      <DndContext>
-        <ul className="list-container">
-          {store.list?.map((list) => (
-            <li className="list-item" key={list.id}>
-              <section className="list-header">
-                <h5 className="list-title">{list.title}</h5>
-                <div className="dropdown">
-                  <button className="dropdown-button">
-                    <i className="fa-solid fa-ellipsis"></i>
-                  </button>
-                  <div className="dropdown-menu">
-                    <div className="dropdown-item">
-                      <button
-                        type="button"
-                        onClick={() => deleteList(list.id)}
-                        className="delete-button"
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </section>
+    <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      <main className="home-container">
+        <SortableContext items={ColumnList}>
+          <ul className="list-container">
+            {store.list?.map((list) => (
+              <SortableList list={list} key={list.id} />
+            ))}
+          </ul>
+        </SortableContext>
 
-              {list.tasks?.length > 0 &&
-                list.tasks.map((task) => (
-                  <div className="task-item" key={task.id}>
-                    <div className="task-text">{task.text}</div>
-                    <button
-                      type="button"
-                      onClick={() => deleteTask(task.id, list.id)}
-                      className="task-delete-button"
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </div>
-                ))}
+        <AddThings textItem="List" />
 
-              <div className="add-task-container">
-                <AddThings textItem="Task" id={list.id} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </DndContext>
-
-      <AddThings textItem="List" />
-    </main>
+        {createPortal(
+          <DragOverlay>
+            {activeList && <SortableList list={activeList} />}
+          </DragOverlay>,
+          document.body
+        )}
+      </main>
+    </DndContext>
   );
 };

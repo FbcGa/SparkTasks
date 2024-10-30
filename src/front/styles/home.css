@@ -107,6 +107,11 @@
   border-radius: 8px;
   padding: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+
+  &.dragging {
+    border: 2px inset red;
+    opacity: 0.6;
+  }
 }
 
 /* Header for each list */
@@ -143,10 +148,6 @@
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   padding: 5px;
-}
-
-.dropdown:hover .dropdown-menu {
-  display: block;
 }
 
 .dropdown-item {
