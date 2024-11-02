@@ -18,42 +18,44 @@ export function Register() {
     }
   };
   return (
-    <section>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <h1>Register</h1>
-          <label htmlFor="exampleInputEmail1" className="htmlForm-label">
+    <section className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <div className="form-group">
+          <h1 className="form-title">Register</h1>
+          <label htmlFor="email" className="form-label">
             Email address
           </label>
           <input
             type="email"
-            className="htmlForm-control"
-            id="exampleInputEmail1"
-            aria-describedby="emailHelp"
+            id="email"
             ref={emailRef}
+            className="input-field"
+            placeholder="Enter your email"
           />
-          <div id="emailHelp" className="htmlForm-text">
+          <div className="form-text">
             We'll never share your email with anyone else.
           </div>
         </div>
-        <div className="mb-3">
-          <label htmlFor="exampleInputPassword1" className="htmlForm-label">
+        <div className="form-group">
+          <label htmlFor="password" className="form-label">
             Password
           </label>
           <input
             type="password"
-            className="htmlForm-control"
-            id="exampleInputPassword1"
+            id="password"
             ref={passwordRef}
+            className="input-field"
+            placeholder="Enter your password"
           />
         </div>
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="submit-button">
           Submit
         </button>
       </form>
-      <button>
-        <Link className="text-white" to={"/login"}>
-          If you already have an account, click here!!.
+
+      <button type="button" className="register-button">
+        <Link to={"/login"} className="register-link">
+          If you have an account, click here!!
         </Link>
       </button>
     </section>

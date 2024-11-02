@@ -7,8 +7,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(180), unique=False, nullable=False)
 
-    lists = db.relationship('List', backref = 'user' , lazy=True)
-    tasks = db.relationship('Task', backref = 'user' , lazy=True)
+    lists = db.relationship('List', backref = 'user' , lazy=True, cascade='all, delete-orphan')
+    tasks = db.relationship('Task', backref = 'user' , lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -25,7 +25,7 @@ class List(db.Model):
     title = db.Column(db.String(100), unique=False , nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
 
-    tasks = db.relationship('Task', backref='list', lazy=True)
+    tasks = db.relationship('Task', backref='list', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<List {self.id}>'
