@@ -1,18 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo, useRef, useState } from "react";
+import { SortableTask } from "./sortableTask.jsx";
 import { AddThings } from "./addThings.jsx";
 import { Context } from "../store/appContext";
-import { useSortable } from "@dnd-kit/sortable";
+import { useSortable, SortableContext } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 export function SortableList({ list }) {
   const { actions } = useContext(Context);
+  const titleRef = useRef();
+  const [editMode, setEditMode] = useState(false);
+
+  const taskId = useMemo(() => {
+    return list.tasks?.map((task) => task.id);
+  }, [list.tasks]);
 
   const deleteList = async (id) => {
     await actions.deleteList(id);
   };
 
-  const deleteTask = async (id, listId) => {
-    await actions.deleteTask(id, listId);
+  const changeTitleList = async (event, listId) => {
+    if (event.key !== "Enter") return;
+    setEditMode(false);
+    const title = titleRef.current.value;
+
+    await actions.changeListTitle(title, listId);
   };
 
   const {
@@ -27,6 +38,7 @@ export function SortableList({ list }) {
     data: {
       list,
     },
+    disabled: editMode,
   });
 
   const style = {
@@ -41,40 +53,39 @@ export function SortableList({ list }) {
   }
   return (
     <li className="list-item" ref={setNodeRef} style={style}>
-      <section className="list-header" {...attributes} {...listeners}>
-        <h5 className="list-title">{list.title}</h5>
+      <section
+        className="list-header"
+        {...attributes}
+        {...listeners}
+        onClick={() => setEditMode(true)}
+      >
+        {editMode ? (
+          <input
+            ref={titleRef}
+            autoFocus
+            onBlur={() => setEditMode(false)}
+            onKeyDown={(event) => changeTitleList(event, list.id)}
+            className="input-edit"
+          />
+        ) : (
+          <h5 className="list-title">{list.title}</h5>
+        )}
         <div className="dropdown">
-          <button className="dropdown-button">
-            <i className="fa-solid fa-ellipsis"></i>
+          <button
+            type="button"
+            onClick={() => deleteList(list.id)}
+            className="delete-button"
+          >
+            <i className="fa-solid fa-trash"></i>
           </button>
-          <div className="dropdown-menu">
-            <div className="dropdown-item">
-              <button
-                type="button"
-                onClick={() => deleteList(list.id)}
-                className="delete-button"
-              >
-                <i className="fa-solid fa-trash"></i>
-                <span>Delete</span>
-              </button>
-            </div>
-          </div>
         </div>
       </section>
 
-      {list.tasks?.length > 0 &&
-        list.tasks.map((task) => (
-          <div className="task-item" key={task.id}>
-            <div className="task-text">{task.text}</div>
-            <button
-              type="button"
-              onClick={() => deleteTask(task.id, list.id)}
-              className="task-delete-button"
-            >
-              <i className="fa-solid fa-trash"></i>
-            </button>
-          </div>
+      <SortableContext items={taskId}>
+        {list.tasks.map((task) => (
+          <SortableTask task={task} key={task.id} listId={list.id} />
         ))}
+      </SortableContext>
 
       <div className="add-task-container">
         <AddThings textItem="Task" id={list.id} />

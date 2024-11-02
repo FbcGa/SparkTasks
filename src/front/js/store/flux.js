@@ -1,3 +1,4 @@
+import { arrayMove } from "@dnd-kit/sortable";
 const getState = ({ getStore, getActions, setStore }) => {
   return {
     store: {
@@ -79,6 +80,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         localStorage.setItem("token", data.auth);
         return data;
       },
+      //functions list
       allList: async () => {
         const token = localStorage.getItem("token");
         const resp = await fetch(process.env.BACKEND_URL + "/api/list", {
@@ -105,9 +107,13 @@ const getState = ({ getStore, getActions, setStore }) => {
           },
           body: JSON.stringify({ title }),
         });
+        if (resp.status === 401) {
+          return null;
+        }
         if (!resp.ok) {
           return false;
         }
+
         const data = await resp.json();
         setStore({
           list: [
@@ -138,6 +144,33 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ list: filterList });
         return data;
       },
+      changeListTitle: async (title, listId) => {
+        const store = getStore();
+        const token = localStorage.getItem("token");
+
+        const resp = await fetch(process.env.BACKEND_URL + "/api/list/change", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title, list_id: listId }),
+        });
+
+        if (!resp.ok) {
+          console.error("Failed to update list title");
+          return false;
+        }
+
+        const data = await resp.json();
+
+        const updatedLists = store.list.map((list) =>
+          list.id === listId ? { ...list, title: data.list.title } : list
+        );
+
+        setStore({ list: updatedLists });
+      },
+
       addTask: async (text, listId) => {
         const store = getStore();
         const token = localStorage.getItem("token");
@@ -192,6 +225,37 @@ const getState = ({ getStore, getActions, setStore }) => {
       /*----sort list---------------*/
       sortLists: (newOrder) => {
         setStore({ list: newOrder });
+        console.log(newOrder);
+        ///aqui debe ir la logica para modificar el orden de las listas
+      },
+      sortTasks: (fromListId, toListId, oldIndexTask, newIndexTask) => {
+        const store = getStore();
+        const updatedLists = structuredClone(store.list);
+
+        // Encontrar las listas de origen y destino
+        const fromList = updatedLists.find((list) => list.id === fromListId);
+        const toList = updatedLists.find((list) => list.id === toListId);
+
+        // Validar que ambas listas existan
+        if (!fromList || !toList) {
+          console.error("No se encontró la lista de origen o destino");
+          return;
+        }
+
+        if (fromListId === toListId) {
+          // Reordenamiento dentro de la misma lista
+          fromList.tasks = arrayMove(
+            fromList.tasks,
+            oldIndexTask,
+            newIndexTask
+          );
+        } else {
+          // Mover la tarea a otra lista
+          const [movedTask] = fromList.tasks.splice(oldIndexTask, 1); // Remover de origen
+          toList.tasks.splice(newIndexTask, 0, movedTask); // Insertar en el destino
+        }
+
+        setStore({ list: updatedLists });
       },
     },
   };

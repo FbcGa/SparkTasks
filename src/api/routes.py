@@ -121,6 +121,27 @@ def delete_list():
         return jsonify({"mssg": "list delete successfully"}),200
     except Exception as error:
         return jsonify({"error": f"{error}"}), 500 
+    
+@api.route('/list/change', methods=['PUT'])
+@jwt_required()
+def change_title_list():
+    body = request.json
+    list_id = body.get("list_id", None)
+    title = body.get("title", None)
+    current_user = get_jwt_identity()
+    
+    if list_id is None or title is None:
+        return jsonify({"error":"missing arguements"})
+    updatelist = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
+
+    updatelist.title = title
+
+    try:
+        db.session.commit()
+        return jsonify({"list": updatelist.serialize()}),200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"error": f"{error}"}),500
         
 #----------------------------------------------------------------------------------------    
 @api.route('/task', methods=['POST'])

@@ -46,6 +46,9 @@
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+.input-edit:focus {
+  border: 3px inset red;
+}
 
 .form-text {
   font-size: 0.875rem;
@@ -107,6 +110,7 @@
   border-radius: 8px;
   padding: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  list-style: none;
 
   &.dragging {
     border: 2px inset red;
@@ -128,33 +132,6 @@
   font-family: monospace;
 }
 
-/* Dropdown styles */
-.dropdown {
-  position: relative;
-}
-
-.dropdown-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: white;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  padding: 5px;
-}
-
-.dropdown-item {
-  text-align: center;
-  margin: 5px 0;
-}
-
 .delete-button {
   display: flex;
   align-items: center;
@@ -174,12 +151,20 @@
   border: 1px solid black;
   border-radius: 4px;
   margin-top: 5px;
+
+  &.drag {
+    height: 70px;
+    border: 2px inset red;
+    opacity: 0.6;
+  }
 }
 
 .task-text {
   flex-grow: 1;
   font-size: 1.2rem;
   font-family: monospace;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .task-delete-button {

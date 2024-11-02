@@ -3,14 +3,34 @@ import { Context } from "../store/appContext";
 import { useAuth } from "../hooks/authUser";
 import { AddThings } from "../component/addThings.jsx";
 import "../../styles/home.css";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
-import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  KeyboardSensor,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import { SortableList } from "../component/sortableList.jsx";
 import { createPortal } from "react-dom";
 
+// Presentational Component for Task to use within DragOverlay
+const TaskOverlay = ({ task }) => (
+  <div className="task-overlay">
+    {/* Render your task details here */}
+    {task.text}
+  </div>
+);
+
 export const Home = () => {
   const { store, actions } = useContext(Context);
-  const [activeList, setActiveList] = useState([]);
+  const [activeList, setActiveList] = useState(null);
+  const [activeTask, setActiveTask] = useState(null);
 
   const ColumnList = useMemo(
     () => store.list.map((list) => list.id),
@@ -18,8 +38,15 @@ export const Home = () => {
   );
 
   const onDragStart = (event) => {
-    if (event.active.data.current?.list) {
-      setActiveList(event.active.data.current.list);
+    const activeData = event.active.data.current;
+
+    if (activeData?.list) {
+      setActiveList(activeData.list);
+    } else if (activeData?.task) {
+      setActiveTask({
+        ...activeData.task,
+        listId: activeData.listId,
+      });
     }
   };
 
@@ -30,17 +57,72 @@ export const Home = () => {
     const activeListId = active.id;
     const overListId = over.id;
 
-    if (activeListId === overListId) return;
+    if (activeListId !== overListId) {
+      const oldListIndex = store.list.findIndex(
+        (list) => list.id === activeListId
+      );
+      const newListIndex = store.list.findIndex(
+        (list) => list.id === overListId
+      );
+      actions.sortLists(arrayMove(store.list, oldListIndex, newListIndex));
+    }
 
-    const oldListIndex = store.list.findIndex(
-      (list) => list.id === activeListId
-    );
-    const newListIndex = store.list.findIndex((list) => list.id === overListId);
-    actions.sortLists(arrayMove(store.list, oldListIndex, newListIndex));
+    setActiveList(null);
+    setActiveTask(null);
   };
+
+  const onDragOver = (event) => {
+    console.log(event);
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeTaskId = active.id;
+    const overTaskId = over.id;
+
+    if (activeTaskId === overTaskId) return;
+
+    const activeData = active.data.current;
+    const overData = over.data.current;
+
+    if (!activeData) return;
+
+    // dropping task over another task
+    if (activeData?.task && overData?.task) {
+      const copyTasks = structuredClone(store.list);
+
+      const fromList = copyTasks.find(
+        (list) => list.id === activeData.task.list_id
+      );
+      const toList = copyTasks.find(
+        (list) => list.id === overData.task.list_id
+      );
+
+      const oldIndexTask = fromList.tasks.findIndex(
+        (task) => task.id === activeTaskId
+      );
+
+      const newIndexTask = toList.tasks.findIndex(
+        (task) => task.id === overTaskId
+      );
+
+      actions.sortTasks(fromList.id, toList.id, oldIndexTask, newIndexTask);
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 3 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
   useAuth();
+
   return (
-    <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onDragOver={onDragOver}
+    >
       <main className="home-container">
         <SortableContext items={ColumnList}>
           <ul className="list-container">
@@ -55,6 +137,7 @@ export const Home = () => {
         {createPortal(
           <DragOverlay>
             {activeList && <SortableList list={activeList} />}
+            {activeTask && <TaskOverlay task={activeTask} />}
           </DragOverlay>,
           document.body
         )}
