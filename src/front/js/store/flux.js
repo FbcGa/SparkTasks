@@ -223,11 +223,35 @@ const getState = ({ getStore, getActions, setStore }) => {
         return data;
       },
       /*----sort list---------------*/
-      sortLists: (newOrder) => {
+      sortLists: async (newOrder) => {
         setStore({ list: newOrder });
-        console.log(newOrder);
-        ///aqui debe ir la logica para modificar el orden de las listas
+        const token = localStorage.getItem("token");
+
+        // Obtener solo los IDs de lista en el nuevo orden
+        const listOrder = newOrder.map((list) => list.id);
+
+        try {
+          const resp = await fetch(
+            process.env.BACKEND_URL + "/api/list/reorder",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ new_order: listOrder }),
+            }
+          );
+
+          if (!resp.ok) {
+            console.error("Error al reordenar las listas en el backend");
+            return false;
+          }
+        } catch (error) {
+          console.error("Error al reordenar listas:", error);
+        }
       },
+
       sortTasks: (fromListId, toListId, oldIndexTask, newIndexTask) => {
         const store = getStore();
         const updatedLists = structuredClone(store.list);

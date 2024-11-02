@@ -22,18 +22,16 @@ class User(db.Model):
 #relación de uno a muchos User con List
 class List(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), unique=False , nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
+    title = db.Column(db.String(120), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    tasks = db.relationship('Task', backref='list', lazy=True)
+    position = db.Column(db.Integer, nullable=True)  # Nueva columna para ordenar las listas
 
-    tasks = db.relationship('Task', backref='list', lazy=True, cascade='all, delete-orphan')
-
-    def __repr__(self):
-        return f'<List {self.id}>'
-    
     def serialize(self):
         return {
             "id": self.id,
             "title": self.title,
+            "position": self.position,  
             "tasks": [task.serialize() for task in self.tasks]
         }
 #relación de uno a muchos List con Task    

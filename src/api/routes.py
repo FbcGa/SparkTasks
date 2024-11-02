@@ -76,30 +76,35 @@ def add_list():
     title = body.get('title', None)
 
     if title is None:
-        return jsonify({"error": "fill out the title"})
-    
+        return jsonify({"error": "Please provide a title for the list"}), 400
+
     try:
-        new_list = List(title=title, user_id=current_user['user_id'])
+        max_position = db.session.query(db.func.max(List.position)).filter_by(user_id=current_user['user_id']).scalar()
+        
+        new_position = (max_position + 1) if max_position is not None else 0
+
+        new_list = List(title=title, user_id=current_user['user_id'], position=new_position)
         db.session.add(new_list)
         db.session.commit()
         db.session.refresh(new_list)
-        return jsonify({"mssg": "list create successfully", "list": new_list.serialize()}),200
+
+        return jsonify({"message": "List created successfully", "list": new_list.serialize()}), 201
     except Exception as error:
         db.session.rollback()
-        return jsonify({"error": f"{error}"}), 500
-    
+        return jsonify({"error": str(error)}), 500
+  
 
 @api.route('/list', methods=['GET'])
 @jwt_required()
 def get_all_list():
     try:
         current_user = get_jwt_identity()
-        lists = List.query.filter_by(user_id=current_user['user_id']).all()
+        lists = List.query.filter_by(user_id=current_user['user_id']).order_by(List.position).all()
         serialize_list = [list.serialize() for list in lists]
-        return jsonify({"lists": serialize_list}),200
-    
+        return jsonify({"lists": serialize_list}), 200
     except Exception as error:
-        return jsonify({"error": f"{error}"}), 500
+        return jsonify({"error": str(error)}), 500
+
     
 @api.route('/list/delete', methods=['DELETE'])
 @jwt_required()
@@ -189,3 +194,35 @@ def delete_task():
         return jsonify({"mssg": "task delete successfully"}),200
     except Exception as error:
         return jsonify({"error": f"{error}"}),500
+
+@api.route('/list/reorder', methods=['PUT'])
+@jwt_required()
+def reorder_lists():
+    current_user = get_jwt_identity()
+    body = request.json
+    new_order = body.get("new_order", None)  # Un array de IDs en el nuevo orden
+
+    if not new_order:
+        return jsonify({"error": "No order provided"}), 400
+
+    # Consultamos las listas del usuario actual
+    lists = List.query.filter_by(user_id=current_user['user_id']).all()
+    list_ids = [lst.id for lst in lists]
+
+    # Validamos que todos los IDs en `new_order` pertenezcan al usuario
+    if set(new_order) != set(list_ids):
+        return jsonify({"error": "Invalid list IDs in order"}), 400
+
+    try:
+        # Actualizamos el orden de cada lista según el nuevo orden
+        for position, list_id in enumerate(new_order):
+            lst = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
+            if lst:
+                lst.position = position
+
+        db.session.commit()
+        return jsonify({"message": "Lists reordered successfully"}), 200
+
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"error": str(error)}), 500
