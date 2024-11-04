@@ -61,6 +61,7 @@ export const Home = () => {
       const oldListIndex = store.list.findIndex(
         (list) => list.id === activeListId
       );
+
       const newListIndex = store.list.findIndex(
         (list) => list.id === overListId
       );
@@ -72,7 +73,6 @@ export const Home = () => {
   };
 
   const onDragOver = (event) => {
-    console.log(event);
     const { active, over } = event;
     if (!over) return;
 
@@ -84,28 +84,28 @@ export const Home = () => {
     const activeData = active.data.current;
     const overData = over.data.current;
 
-    if (!activeData) return;
+    if (!activeData || !activeData.task || !overData || !overData.task) return;
 
-    // dropping task over another task
-    if (activeData?.task && overData?.task) {
-      const copyTasks = structuredClone(store.list);
+    const copyTasks = structuredClone(store.list);
+    const fromList = copyTasks.find(
+      (list) => list.id === activeData.task.list_id
+    );
+    const toList = copyTasks.find((list) => list.id === overData.task.list_id);
 
-      const fromList = copyTasks.find(
-        (list) => list.id === activeData.task.list_id
-      );
-      const toList = copyTasks.find(
-        (list) => list.id === overData.task.list_id
-      );
-
+    if (fromList && fromList.id === toList.id) {
       const oldIndexTask = fromList.tasks.findIndex(
         (task) => task.id === activeTaskId
       );
-
-      const newIndexTask = toList.tasks.findIndex(
+      const newIndexTask = fromList.tasks.findIndex(
         (task) => task.id === overTaskId
       );
 
-      actions.sortTasks(fromList.id, toList.id, oldIndexTask, newIndexTask);
+      const updatedTasks = arrayMove(
+        fromList.tasks,
+        oldIndexTask,
+        newIndexTask
+      );
+      actions.sortTaskWithinList(fromList.id, updatedTasks);
     }
   };
 

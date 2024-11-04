@@ -25,19 +25,20 @@ class List(db.Model):
     title = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     tasks = db.relationship('Task', backref='list', lazy=True)
-    position = db.Column(db.Integer, nullable=True)  # Nueva columna para ordenar las listas
+    position = db.Column(db.Integer, nullable=True) 
 
     def serialize(self):
         return {
             "id": self.id,
             "title": self.title,
             "position": self.position,  
-            "tasks": [task.serialize() for task in self.tasks]
+            "tasks": sorted([task.serialize() for task in self.tasks], key=lambda x: x['position'])
         }
 #relación de uno a muchos List con Task    
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(100), unique=False, nullable=False)
+    position = db.Column(db.Integer, nullable=True) 
     list_id = db.Column(db.Integer, db.ForeignKey('list.id', ondelete='CASCADE'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
 
@@ -48,5 +49,6 @@ class Task(db.Model):
         return {
             "list_id": self.list_id,
             "id": self.id,
-            "text": self.text
+            "text": self.text,
+            "position": self.position
         }   

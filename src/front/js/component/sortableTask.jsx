@@ -82,7 +82,7 @@ export function SortableTask({ task, listId }) {
       onClick={() => setEditMode(true)}
     >
       <p className="task-text">
-        {task.text} - {task.id}{" "}
+        {task.text} - {task.position}{" "}
       </p>
 
       <button

@@ -226,8 +226,6 @@ const getState = ({ getStore, getActions, setStore }) => {
       sortLists: async (newOrder) => {
         setStore({ list: newOrder });
         const token = localStorage.getItem("token");
-
-        // Obtener solo los IDs de lista en el nuevo orden
         const listOrder = newOrder.map((list) => list.id);
 
         try {
@@ -251,35 +249,42 @@ const getState = ({ getStore, getActions, setStore }) => {
           console.error("Error al reordenar listas:", error);
         }
       },
+      sortTaskWithinList: async (listId, updatedTasks) => {
+        const token = localStorage.getItem("token");
 
-      sortTasks: (fromListId, toListId, oldIndexTask, newIndexTask) => {
-        const store = getStore();
-        const updatedLists = structuredClone(store.list);
-
-        // Encontrar las listas de origen y destino
-        const fromList = updatedLists.find((list) => list.id === fromListId);
-        const toList = updatedLists.find((list) => list.id === toListId);
-
-        // Validar que ambas listas existan
-        if (!fromList || !toList) {
-          console.error("No se encontró la lista de origen o destino");
-          return;
-        }
-
-        if (fromListId === toListId) {
-          // Reordenamiento dentro de la misma lista
-          fromList.tasks = arrayMove(
-            fromList.tasks,
-            oldIndexTask,
-            newIndexTask
+        try {
+          const resp = await fetch(
+            `${process.env.BACKEND_URL}/api/tasks/reorder`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                list_id: listId,
+                ordered_task_ids: updatedTasks.map((task) => task.id),
+              }),
+            }
           );
-        } else {
-          // Mover la tarea a otra lista
-          const [movedTask] = fromList.tasks.splice(oldIndexTask, 1); // Remover de origen
-          toList.tasks.splice(newIndexTask, 0, movedTask); // Insertar en el destino
-        }
 
-        setStore({ list: updatedLists });
+          if (!resp.ok) {
+            console.error("Error al reordenar las tareas en el backend");
+            return;
+          }
+
+          // Actualizar el estado local después de la confirmación del backend
+          const store = getStore();
+          const updatedLists = structuredClone(store.list);
+          const targetList = updatedLists.find((list) => list.id === listId);
+
+          if (targetList) {
+            targetList.tasks = updatedTasks; // Reemplazar con la versión reordenada
+            setStore({ list: updatedLists });
+          }
+        } catch (error) {
+          console.error("Error al reordenar tareas:", error);
+        }
       },
     },
   };

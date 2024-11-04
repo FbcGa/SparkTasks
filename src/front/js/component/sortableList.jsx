@@ -69,7 +69,7 @@ export function SortableList({ list }) {
           />
         ) : (
           <h5 className="list-title">
-            {list.title} - {list.id}{" "}
+            {list.title} - {list.position}{" "}
           </h5>
         )}
         <div className="dropdown">

@@ -1,7 +1,4 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
-from flask import Flask, request, jsonify, url_for, Blueprint
+from flask import Flask, request, jsonify, Blueprint
 from api.models import db, User, List, Task
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
@@ -13,87 +10,79 @@ api = Blueprint('api', __name__)
 # Allow CORS requests to this API
 CORS(api)
 
-
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
+    return jsonify({"message": "Hello! I'm a message from the backend"}), 200
 
-    response_body = {
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
-    }
-    return jsonify(response_body), 200
-
+# Register
 @api.route('/register', methods=['POST'])
 def register():
     body = request.json
-    email = body.get("email", None)
-    password = body.get("password", None)
-    password_hash = generate_password_hash(password=password)
+    email = body.get("email")
+    password = body.get("password")
 
-    if email is None or password is None:
-        return jsonify({"error": "all the fields must be filled out"}), 400
-    
-    if User.query.filter_by(email=email).first() is not None:
-        return jsonify({"error": "this email is already taken"}), 400
-    
+    if not email or not password:
+        return jsonify({"error": "All fields must be filled out"}), 400
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({"error": "This email is already taken"}), 400
+
     try:
+        password_hash = generate_password_hash(password)
         new_user = User(email=email, password=password_hash)
         db.session.add(new_user)
         db.session.commit()
-        db.session.refresh(new_user)
         auth_token = create_access_token({"user_id": new_user.id})
-        return jsonify({"user": new_user.serialize(), "auth": auth_token}),201
+        return jsonify({"user": new_user.serialize(), "auth": auth_token}), 201
     except Exception as error:
         db.session.rollback()
-        return jsonify({"error": f"{error}"}),500
-    
+        return jsonify({"error": str(error)}), 500
+
+# Login
 @api.route('/login', methods=['POST'])
 def login():
     body = request.json
-    email = body.get("email", None)
-    password = body.get("password", None)
+    email = body.get("email")
+    password = body.get("password")
 
-    if email is None or password is None:
-        return jsonify({"error": "complet all the fields"}), 400
-    
+    if not email or not password:
+        return jsonify({"error": "Complete all fields"}), 400
+
     try:
         old_user = User.query.filter_by(email=email).first()
-
-        if not old_user or not check_password_hash(old_user.password,password):
+        if not old_user or not check_password_hash(old_user.password, password):
             return jsonify({"error": "Wrong data!"}), 400
         
         auth_token = create_access_token({"user_id": old_user.id})
-        return jsonify({"user": old_user.serialize(), "auth": auth_token}),200
-    
+        return jsonify({"user": old_user.serialize(), "auth": auth_token}), 200
     except Exception as error:
-        return jsonify({"error": f"{error}"}), 500
+        return jsonify({"error": str(error)}), 500
 
- #---------------------------------------------------------------------------------------   
+# Add List
 @api.route('/list', methods=['POST'])
 @jwt_required()
 def add_list():
     current_user = get_jwt_identity()
     body = request.json
-    title = body.get('title', None)
+    title = body.get('title')
 
-    if title is None:
+    if not title:
         return jsonify({"error": "Please provide a title for the list"}), 400
 
     try:
         max_position = db.session.query(db.func.max(List.position)).filter_by(user_id=current_user['user_id']).scalar()
-        
         new_position = (max_position + 1) if max_position is not None else 0
 
         new_list = List(title=title, user_id=current_user['user_id'], position=new_position)
         db.session.add(new_list)
         db.session.commit()
-        db.session.refresh(new_list)
 
         return jsonify({"message": "List created successfully", "list": new_list.serialize()}), 201
     except Exception as error:
         db.session.rollback()
         return jsonify({"error": str(error)}), 500
-  
 
+# Get All Lists
 @api.route('/list', methods=['GET'])
 @jwt_required()
 def get_all_list():
@@ -105,116 +94,124 @@ def get_all_list():
     except Exception as error:
         return jsonify({"error": str(error)}), 500
 
-    
+# Delete List
 @api.route('/list/delete', methods=['DELETE'])
 @jwt_required()
 def delete_list():
     body = request.json
-    list_id = body.get("id", None)
+    list_id = body.get("id")
     current_user = get_jwt_identity()
+
+    if not list_id:
+        return jsonify({"error": "List ID not provided"}), 400
+
     list_delete = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
+    if not list_delete:
+        return jsonify({"error": "List doesn't exist"}), 404
 
     try:
-        if list_id is None:
-            return jsonify({"error": "list_id doesn't found"}),404
-        
-        if not list_delete:
-            return jsonify({"error": "list doesn't exist"}), 404
-        
         db.session.delete(list_delete)
         db.session.commit()
-        return jsonify({"mssg": "list delete successfully"}),200
+        return jsonify({"message": "List deleted successfully"}), 200
     except Exception as error:
-        return jsonify({"error": f"{error}"}), 500 
-    
+        db.session.rollback()
+        return jsonify({"error": str(error)}), 500
+
+# Change List Title
 @api.route('/list/change', methods=['PUT'])
 @jwt_required()
 def change_title_list():
     body = request.json
-    list_id = body.get("list_id", None)
-    title = body.get("title", None)
+    list_id = body.get("list_id")
+    title = body.get("title")
     current_user = get_jwt_identity()
-    
-    if list_id is None or title is None:
-        return jsonify({"error":"missing arguements"})
-    updatelist = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
 
-    updatelist.title = title
+    if not list_id or not title:
+        return jsonify({"error": "Missing arguments"}), 400
+
+    updatelist = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
+    if not updatelist:
+        return jsonify({"error": "List doesn't exist"}), 404
 
     try:
+        updatelist.title = title
         db.session.commit()
-        return jsonify({"list": updatelist.serialize()}),200
+        return jsonify({"list": updatelist.serialize()}), 200
     except Exception as error:
         db.session.rollback()
-        return jsonify({"error": f"{error}"}),500
-        
-#----------------------------------------------------------------------------------------    
+        return jsonify({"error": str(error)}), 500
+
+# Add Task
 @api.route('/task', methods=['POST'])
 @jwt_required()
 def add_task():
     current_user = get_jwt_identity()
     body = request.json
-    text = body.get("text", None)
-    list_id = body.get("list_id", None)
+    text = body.get("text")
+    list_id = body.get("list_id")
 
-    if not List.query.filter_by(id=list_id, user_id=current_user['user_id']).first():
-        return jsonify({"error": "list doesn't exist"}),404
+    if not text or not list_id:
+        return jsonify({"error": "Text and list_id are required"}), 400
 
-    if text is None or list_id is None:
-        return jsonify({"error": "Cannot save a empy task"}),400
+    list_exists = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
+    if not list_exists:
+        return jsonify({"error": "List doesn't exist"}), 404
 
     try:
-        new_task = Task(list_id=list_id, text=text, user_id=current_user['user_id'])
+        max_position = db.session.query(db.func.max(Task.position)).filter_by(list_id=list_id).scalar()
+        new_position = (max_position + 1) if max_position is not None else 0
+
+        new_task = Task(text=text, list_id=list_id, user_id=current_user['user_id'], position=new_position)
         db.session.add(new_task)
         db.session.commit()
-        db.session.refresh(new_task)
-        return jsonify({"mssg": "task add successfully", "task": new_task.serialize()}),200
+
+        return jsonify({"message": "Task added successfully", "task": new_task.serialize()}), 201
     except Exception as error:
         db.session.rollback()
-        return jsonify({"error": f"{error}"}), 500
-    
+        return jsonify({"error": str(error)}), 500
+
+# Delete Task
 @api.route('/task/delete', methods=['DELETE'])
 @jwt_required()
 def delete_task():
     current_user = get_jwt_identity()
     body = request.json
-    task_id = body.get("id", None)
-    list_id = body.get("listId", None)
+    task_id = body.get("id")
+    list_id = body.get("listId")
 
-    if id is None or list_id is None:
-        return jsonify({"error": "parameters are missing"}),404
-    
+    if not task_id or not list_id:
+        return jsonify({"error": "Parameters are missing"}), 400
+
+    task = Task.query.filter_by(id=task_id, list_id=list_id, user_id=current_user['user_id']).first()
+    if not task:
+        return jsonify({"error": "Task doesn't exist"}), 404
+
     try:
-        task = Task.query.filter_by(id=task_id,list_id=list_id,user_id=current_user['user_id']).first()
-        if not task:
-            return jsonify({"error": "task doesn't exist"}), 404
-        
         db.session.delete(task)
         db.session.commit()
-        return jsonify({"mssg": "task delete successfully"}),200
+        return jsonify({"message": "Task deleted successfully"}), 200
     except Exception as error:
-        return jsonify({"error": f"{error}"}),500
+        db.session.rollback()
+        return jsonify({"error": str(error)}), 500
 
+# Reorder Lists
 @api.route('/list/reorder', methods=['PUT'])
 @jwt_required()
 def reorder_lists():
     current_user = get_jwt_identity()
     body = request.json
-    new_order = body.get("new_order", None)  # Un array de IDs en el nuevo orden
+    new_order = body.get("new_order")
 
     if not new_order:
         return jsonify({"error": "No order provided"}), 400
 
-    # Consultamos las listas del usuario actual
     lists = List.query.filter_by(user_id=current_user['user_id']).all()
     list_ids = [lst.id for lst in lists]
 
-    # Validamos que todos los IDs en `new_order` pertenezcan al usuario
     if set(new_order) != set(list_ids):
         return jsonify({"error": "Invalid list IDs in order"}), 400
 
     try:
-        # Actualizamos el orden de cada lista según el nuevo orden
         for position, list_id in enumerate(new_order):
             lst = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
             if lst:
@@ -222,6 +219,41 @@ def reorder_lists():
 
         db.session.commit()
         return jsonify({"message": "Lists reordered successfully"}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"error": str(error)}), 500
+
+@api.route('/tasks/reorder', methods=['PUT'])
+@jwt_required()
+def reorder_tasks():
+    current_user = get_jwt_identity()
+    body = request.json
+    list_id = body.get("list_id")
+    ordered_task_ids = body.get("ordered_task_ids")
+
+    # Validación de parámetros
+    if list_id is None or ordered_task_ids is None:
+        return jsonify({"error": "Missing parameters"}), 400
+
+    # Verificar que la lista pertenece al usuario actual
+    task_list = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
+    if not task_list:
+        return jsonify({"error": "List does not exist or unauthorized"}), 404
+
+    try:
+        # Obtener tareas y asegurar que todas las tareas recibidas pertenecen a la lista
+        tasks = Task.query.filter_by(list_id=list_id).all()
+        task_dict = {task.id: task for task in tasks}
+
+        # Actualizar posiciones en el orden recibido
+        for position, task_id in enumerate(ordered_task_ids):
+            task = task_dict.get(task_id)
+            if task:
+                task.position = position
+        
+        # Guardar cambios en la base de datos
+        db.session.commit()
+        return jsonify({"message": "Tasks reordered successfully"}), 200
 
     except Exception as error:
         db.session.rollback()
