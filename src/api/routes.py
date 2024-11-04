@@ -194,6 +194,30 @@ def delete_task():
         db.session.rollback()
         return jsonify({"error": str(error)}), 500
 
+@api.route('/task/change', methods=['PUT'])
+@jwt_required()
+def change_title_task():
+    body = request.json
+    task_id = body.get("taskId", None)
+    list_id = body.get("listId",None)
+    text = body.get("newTitle",None)
+    current_user = get_jwt_identity()
+
+    if not task_id or not list_id or not text:
+        return jsonify({"error": "Missing arguments"}), 400
+
+    task = Task.query.filter_by(id=task_id, list_id=list_id, user_id=current_user['user_id']).first()
+    if not task:
+        return jsonify({"error": "Task doesn't exist"}), 404
+
+    try:
+        task.text = text
+        db.session.commit()
+        return jsonify({"list": task.serialize()}), 200
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"error": str(error)}), 500
+    
 # Reorder Lists
 @api.route('/list/reorder', methods=['PUT'])
 @jwt_required()
