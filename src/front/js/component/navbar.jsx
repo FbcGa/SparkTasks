@@ -3,21 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const navigate = useNavigate();
-
-  const isLogged = (token) => {
-    if (token) {
-      return (
-        <ul className="navbar-nav ms-auto">
-          <li className="nav-item">
-            <button className="btn btn-link nav-link" onClick={handleSignIn}>
-              <i className="fa-solid fa-right-to-bracket"></i>
-            </button>
-          </li>
-        </ul>
-      );
-    }
-    return;
-  };
+  const token = localStorage.getItem("token");
 
   const handleSignIn = () => {
     localStorage.clear();
@@ -25,12 +11,12 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-md navbar-light bg-light">
+    <nav className="navbar navbar-expand-md navbar-dark">
       <Link className="navbar-brand ms-3" to="/">
         <span>Trello</span>
       </Link>
       <button
-        className="navbar-toggler "
+        className="navbar-toggler"
         type="button"
         data-toggle="collapse"
         data-target="#navbarSupportedContent"
@@ -40,7 +26,23 @@ export const Navbar = () => {
       >
         <span className="navbar-toggler-icon"></span>
       </button>
-      {isLogged(localStorage.getItem("token"))}
+      <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul className="navbar-nav ms-auto">
+          {token ? (
+            <li className="nav-item">
+              <button className="btn btn-link nav-link" onClick={handleSignIn}>
+                <i className="fa-solid fa-right-to-bracket"></i> Logout
+              </button>
+            </li>
+          ) : (
+            <li className="nav-item">
+              <Link className="nav-link" to="/login">
+                <i className="fa-solid fa-right-to-bracket"></i> Login
+              </Link>
+            </li>
+          )}
+        </ul>
+      </div>
     </nav>
   );
 };

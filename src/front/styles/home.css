@@ -1,90 +1,11 @@
-/*
-    home.css: This website contains selectors only used in home.css
-
-    All pages share the styles on index.css but you should create 
-    one more css for each page that will contain the selected used 
-    on that page only (the ones not reused in other pages).
-*/
-/* General container styles */
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 50px auto;
-  padding: 40px;
-  width: 100%;
-  max-width: 400px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+/* --- Global Styles --- */
+body {
+  background-color: #121212; /* Fondo oscuro principal */
+  color: #e0e0e0; /* Texto claro y legible en fondo oscuro */
+  font-family: Arial, sans-serif;
 }
 
-/* Form styles */
-.login-form {
-  width: 100%;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-title {
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.input-field {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.input-edit:focus {
-  border: 3px inset red;
-}
-
-.form-text {
-  font-size: 0.875rem;
-  color: #6c757d;
-}
-
-/* Button styles */
-.submit-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.register-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #6c757d;
-  border: none;
-  border-radius: 4px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-.register-link {
-  text-decoration: none;
-  color: white;
-  display: block;
-  text-align: center;
-}
-
-/* Main container */
+/* Contenedor principal para la página de inicio */
 .home-container {
   display: flex;
   gap: 20px;
@@ -92,9 +13,10 @@
   padding: 20px;
   justify-content: center;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
-/* List container */
+/* Contenedor de listas */
 .list-container {
   display: flex;
   flex-wrap: wrap;
@@ -103,94 +25,116 @@
   padding: 0;
 }
 
-/* Individual list item */
+/* Estilo de cada lista individual */
 .list-item {
   width: 300px;
-  background-color: rgb(91, 153, 194);
+  background-color: #1e1e1e; /* Fondo de lista oscuro */
+  border: 1px solid #3a3a3a;
   border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
   list-style: none;
-
-  &.dragging {
-    border: 2px inset red;
-    opacity: 0.6;
-  }
+  transition: all 0.2s ease-in-out;
 }
 
-/* Header for each list */
+.list-item:hover {
+  transform: scale(1.02);
+  border-color: #00aaff;
+}
+
+.list-item.dragging {
+  border: 2px inset #ff4b4b;
+  opacity: 0.6;
+}
+
+/* Cabecera de la lista */
 .list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .list-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  font-family: monospace;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #e0e0e0;
 }
 
 .delete-button {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   background-color: transparent;
   border: none;
   cursor: pointer;
-  color: red;
+  color: #ff4b4b;
+  font-size: 1.2rem;
+  transition: color 0.2s;
 }
 
-/* Task items */
+.delete-button:hover {
+  color: #ff7878;
+}
+
+/* Estilo de cada tarea */
 .task-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  border: 1px solid black;
+  border: 1px solid #3a3a3a;
   border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
   margin-top: 5px;
-
-  &.drag {
-    height: 70px;
-    border: 2px inset red;
-    opacity: 0.6;
-  }
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
 }
 
+.task-item:hover {
+  transform: scale(1.01);
+  border-color: #00aaff;
+}
+
+.task-item.drag {
+  height: 70px;
+  border: 2px inset #ff4b4b;
+  opacity: 0.6;
+}
+
+/* Texto de la tarea */
 .task-text {
   flex-grow: 1;
-  font-size: 1.2rem;
-  font-family: monospace;
+  font-size: 1rem;
+  color: #d1d1d1;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
+/* Botón para eliminar la tarea */
 .task-delete-button {
-  background-color: red;
+  background-color: #ff4b4b;
   border: none;
   color: white;
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 4px;
+  transition: background-color 0.3s;
 }
 
-/* Add task container */
-.add-task-container {
-  padding-top: 10px;
+.task-delete-button:hover {
+  background-color: #e53e3e;
 }
 
-/* Container for the add item section */
+/* Contenedor de "Agregar Elementos" */
 .add-things-container {
   width: 280px;
-  margin-top: 10px;
+  margin-top: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Input container styles */
+/* Contenedor de entrada */
 .input-container {
   display: flex;
   flex-direction: column;
@@ -198,23 +142,26 @@
   width: 100%;
 }
 
-/* Textarea input styles */
+/* Estilo del textarea para añadir elementos */
 .text-input {
   width: 100%;
   height: 60px;
   resize: none;
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #3a3a3a;
   border-radius: 4px;
   font-size: 1rem;
-  font-family: sans-serif;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
 }
 
-/* Button for adding the item */
+.text-input:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+/* Botón para añadir el elemento */
 .add-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   background-color: #4caf50;
   color: white;
   border: none;
@@ -228,11 +175,8 @@
   background-color: #45a049;
 }
 
-/* Button to toggle the input field */
+/* Botón para mostrar el campo de entrada */
 .toggle-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   background-color: #008cba;
   color: white;
   border: none;
@@ -244,4 +188,135 @@
 
 .toggle-button:hover {
   background-color: #007bb5;
+}
+
+/* Estilo para la entrada de texto en modo de edición */
+.input-edit {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #007bb5;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #333333;
+  color: #e0e0e0;
+}
+
+.input-edit:focus {
+  outline: none;
+  border: 2px solid #4caf50;
+  background-color: #2a2a2a;
+}
+
+/* --- Login Styles --- */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 50px auto;
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.login-form {
+  width: 100%;
+}
+
+.form-title {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #00aaff;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 1rem;
+  color: #e0e0e0;
+  margin-bottom: 5px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  transition: border-color 0.3s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #00aaff;
+}
+
+.form-text {
+  font-size: 0.85rem;
+  color: #b0b0b0;
+  margin-top: 5px;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #00aaff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #0090dd;
+}
+
+.register-button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 15px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.register-button:hover {
+  background-color: #5a6268;
+}
+
+.register-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* --- Navbar Styles (Dark Theme) --- */
+.navbar {
+  background-color: #2c2c2c;
+}
+
+.navbar-brand,
+.nav-link {
+  color: #e0e0e0;
+}
+
+.nav-link:hover {
+  color: #00aaff;
+}
+
+.nav-item button.btn-link:hover {
+  color: #ff4b4b;
 }

@@ -68,9 +68,7 @@ export function SortableList({ list }) {
             className="input-edit"
           />
         ) : (
-          <h5 className="list-title">
-            {list.title} - {list.position}{" "}
-          </h5>
+          <h5 className="list-title">{list.title}</h5>
         )}
         <div className="dropdown">
           <button

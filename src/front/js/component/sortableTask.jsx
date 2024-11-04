@@ -81,9 +81,7 @@ export function SortableTask({ task, listId }) {
       {...listeners}
       onClick={() => setEditMode(true)}
     >
-      <p className="task-text">
-        {task.text} - {task.position}{" "}
-      </p>
+      <p className="task-text">{task.text}</p>
 
       <button
         type="button"
