@@ -231,30 +231,63 @@ def reorder_tasks():
     list_id = body.get("list_id")
     ordered_task_ids = body.get("ordered_task_ids")
 
-    # Validación de parámetros
     if list_id is None or ordered_task_ids is None:
         return jsonify({"error": "Missing parameters"}), 400
 
-    # Verificar que la lista pertenece al usuario actual
     task_list = List.query.filter_by(id=list_id, user_id=current_user['user_id']).first()
     if not task_list:
         return jsonify({"error": "List does not exist or unauthorized"}), 404
 
     try:
-        # Obtener tareas y asegurar que todas las tareas recibidas pertenecen a la lista
         tasks = Task.query.filter_by(list_id=list_id).all()
         task_dict = {task.id: task for task in tasks}
 
-        # Actualizar posiciones en el orden recibido
         for position, task_id in enumerate(ordered_task_ids):
             task = task_dict.get(task_id)
             if task:
                 task.position = position
-        
-        # Guardar cambios en la base de datos
+
         db.session.commit()
         return jsonify({"message": "Tasks reordered successfully"}), 200
 
+    except Exception as error:
+        db.session.rollback()
+        return jsonify({"error": str(error)}), 500
+
+@api.route('/task/move', methods=['PUT'])
+@jwt_required()
+def move_task():
+    current_user = get_jwt_identity()
+    body = request.json
+    from_list_id = body.get("fromListId")
+    to_list_id = body.get("toListId")
+    updated_from_tasks = body.get("updatedFromTasks")
+    updated_to_tasks = body.get("updatedToTasks")
+
+    if from_list_id is None or to_list_id is None or updated_from_tasks is None or updated_to_tasks is None:
+        return jsonify({"error": "Faltan parámetros"}), 400
+
+    from_list = List.query.filter_by(id=from_list_id, user_id=current_user['user_id']).first()
+    to_list = List.query.filter_by(id=to_list_id, user_id=current_user['user_id']).first()
+
+    if not from_list or not to_list:
+        return jsonify({"error": "Lista de origen o destino no encontrada o sin autorización"}), 404
+
+    try:
+        for task_data in updated_from_tasks:
+            task = Task.query.get(task_data["id"])
+            task.position = task_data["position"]
+            task.list_id = from_list_id
+
+        for task_data in updated_to_tasks:
+            task = Task.query.get(task_data["id"])
+            task.position = task_data["position"]
+            task.list_id = to_list_id
+
+        db.session.commit()
+
+        updated_lists = List.query.filter_by(user_id=current_user['user_id']).all()
+        return jsonify({"updatedLists": [list.serialize() for list in updated_lists]}), 200
     except Exception as error:
         db.session.rollback()
         return jsonify({"error": str(error)}), 500

@@ -74,6 +74,7 @@ export const Home = () => {
 
   const onDragOver = (event) => {
     const { active, over } = event;
+    console.log(event);
     if (!over) return;
 
     const activeTaskId = active.id;
@@ -85,8 +86,8 @@ export const Home = () => {
     const overData = over.data.current;
 
     if (!activeData || !activeData.task || !overData || !overData.task) return;
-
     const copyTasks = structuredClone(store.list);
+
     const fromList = copyTasks.find(
       (list) => list.id === activeData.task.list_id
     );
@@ -106,6 +107,58 @@ export const Home = () => {
         newIndexTask
       );
       actions.sortTaskWithinList(fromList.id, updatedTasks);
+    }
+    if (fromList && fromList.id !== toList.id) {
+      const oldIndexTask = fromList.tasks.findIndex(
+        (task) => task.id === activeTaskId
+      );
+
+      const newIndexTask = toList.tasks.findIndex(
+        (task) => task.id === overTaskId
+      );
+
+      const [movedTask] = fromList.tasks.splice(oldIndexTask, 1);
+
+      movedTask.list_id = toList.id;
+
+      toList.tasks.splice(newIndexTask, 0, movedTask);
+
+      fromList.tasks.forEach((task, index) => {
+        task.position = index;
+      });
+      toList.tasks.forEach((task, index) => {
+        task.position = index;
+      });
+
+      actions.moveTaskToAnotherList(
+        fromList.id,
+        toList.id,
+        fromList.tasks,
+        toList.tasks
+      );
+    }
+    if (overData?.list && activeData?.task) {
+      console.log("Moving to an empty list");
+      const oldIndexTask = fromList.tasks.findIndex(
+        (task) => task.id === activeTaskId
+      );
+      const [movedTask] = fromList.tasks.splice(oldIndexTask, 1);
+
+      // Actualizamos el `list_id` de la tarea y la ponemos en la posición 0 en la lista vacía
+      movedTask.list_id = toList.id;
+      movedTask.position = 0;
+      toList.tasks.push(movedTask);
+
+      // Reasignar posiciones en `fromList`
+      fromList.tasks.forEach((task, index) => (task.position = index));
+
+      // Actualizar el backend
+      actions.moveTaskToAnotherList(
+        fromList.id,
+        toList.id,
+        fromList.tasks,
+        toList.tasks
+      );
     }
   };
 

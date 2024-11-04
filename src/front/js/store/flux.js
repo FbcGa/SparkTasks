@@ -286,6 +286,42 @@ const getState = ({ getStore, getActions, setStore }) => {
           console.error("Error al reordenar tareas:", error);
         }
       },
+      moveTaskToAnotherList: async (
+        fromListId,
+        toListId,
+        updatedFromTasks,
+        updatedToTasks
+      ) => {
+        const token = localStorage.getItem("token");
+
+        try {
+          const resp = await fetch(process.env.BACKEND_URL + "/api/task/move", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              fromListId,
+              toListId,
+              updatedFromTasks,
+              updatedToTasks,
+            }),
+          });
+
+          if (!resp.ok) {
+            console.error("Error al mover la tarea en el backend");
+            return;
+          }
+
+          const data = await resp.json();
+          console.log("Tarea movida con éxito:", data);
+          // Actualizar el estado local si es necesario
+          setStore({ list: data.updatedLists });
+        } catch (error) {
+          console.error("Error al mover la tarea:", error);
+        }
+      },
     },
   };
 };
