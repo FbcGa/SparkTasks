@@ -222,6 +222,41 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ list: deleteTask });
         return data;
       },
+      updateTaskTitle: async (taskId, listId, newTitle) => {
+        const store = getStore();
+        const token = localStorage.getItem("token");
+
+        const resp = await fetch(process.env.BACKEND_URL + "/api/task/change", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ taskId, listId, newTitle }),
+        });
+
+        if (!resp.ok) {
+          console.error("Failed to update task title");
+          return false;
+        }
+
+        const data = await resp.json();
+
+        const updatedLists = store.list.map((list) => {
+          if (list.id === data.list.list_id) {
+            return {
+              ...list,
+              tasks: list.tasks.map((task) =>
+                task.id === data.list.id ? data.list : task
+              ),
+            };
+          }
+          return list;
+        });
+
+        setStore({ list: updatedLists });
+      },
+
       /*----sort list---------------*/
       sortLists: async (newOrder) => {
         setStore({ list: newOrder });
@@ -315,8 +350,6 @@ const getState = ({ getStore, getActions, setStore }) => {
           }
 
           const data = await resp.json();
-          console.log("Tarea movida con éxito:", data);
-          // Actualizar el estado local si es necesario
           setStore({ list: data.updatedLists });
         } catch (error) {
           console.error("Error al mover la tarea:", error);

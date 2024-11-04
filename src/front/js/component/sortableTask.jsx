@@ -4,7 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 export function SortableTask({ task, listId }) {
-  const { store, actions } = useContext(Context);
+  const { actions } = useContext(Context);
   const [editMode, setEditMode] = useState(false);
   const refTask = useRef();
 
@@ -32,11 +32,11 @@ export function SortableTask({ task, listId }) {
     transform: CSS.Transform.toString(transform),
   };
 
-  const changeTitleTask = (e) => {
+  const changeTitleTask = async (e) => {
     if (e.key !== "Enter") return;
     setEditMode(false);
     const titleTask = refTask.current.value;
-    //acaaaaa va ir la funcion para cambiar el titulo del task
+    await actions.updateTaskTitle(task.id, listId, titleTask);
   };
 
   if (editMode) {
