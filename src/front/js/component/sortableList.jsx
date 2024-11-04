@@ -53,7 +53,7 @@ export function SortableList({ list }) {
   }
   return (
     <li className="list-item" ref={setNodeRef} style={style}>
-      <section
+      <div
         className="list-header"
         {...attributes}
         {...listeners}
@@ -68,7 +68,9 @@ export function SortableList({ list }) {
             className="input-edit"
           />
         ) : (
-          <h5 className="list-title">{list.title}</h5>
+          <h5 className="list-title">
+            {list.title} - {list.position}{" "}
+          </h5>
         )}
         <div className="dropdown">
           <button
@@ -79,7 +81,7 @@ export function SortableList({ list }) {
             <i className="fa-solid fa-trash"></i>
           </button>
         </div>
-      </section>
+      </div>
 
       <SortableContext items={taskId}>
         {list.tasks.map((task) => (

@@ -61,6 +61,7 @@ export const Home = () => {
       const oldListIndex = store.list.findIndex(
         (list) => list.id === activeListId
       );
+
       const newListIndex = store.list.findIndex(
         (list) => list.id === overListId
       );
@@ -72,7 +73,6 @@ export const Home = () => {
   };
 
   const onDragOver = (event) => {
-    console.log(event);
     const { active, over } = event;
     if (!over) return;
 
@@ -84,19 +84,39 @@ export const Home = () => {
     const activeData = active.data.current;
     const overData = over.data.current;
 
-    if (!activeData) return;
+    if (!activeData || !activeData.task) return;
 
-    // dropping task over another task
-    if (activeData?.task && overData?.task) {
-      const copyTasks = structuredClone(store.list);
+    const copyTasks = structuredClone(store.list);
 
-      const fromList = copyTasks.find(
-        (list) => list.id === activeData.task.list_id
+    const fromList = copyTasks.find(
+      (list) => list.id === activeData.task.list_id
+    );
+
+    const toList = overData.list
+      ? copyTasks.find((list) => list.id === overData.list.id)
+      : copyTasks.find((list) => list.id === overData.task.list_id);
+
+    if (!fromList || !toList) return;
+
+    // Mover dentro de la misma lista
+    if (fromList.id === toList.id) {
+      const oldIndexTask = fromList.tasks.findIndex(
+        (task) => task.id === activeTaskId
       );
-      const toList = copyTasks.find(
-        (list) => list.id === overData.task.list_id
+      const newIndexTask = fromList.tasks.findIndex(
+        (task) => task.id === overTaskId
       );
 
+      const updatedTasks = arrayMove(
+        fromList.tasks,
+        oldIndexTask,
+        newIndexTask
+      );
+      actions.sortTaskWithinList(fromList.id, updatedTasks);
+    }
+
+    // Mover a otra lista que tiene tareas
+    else if (fromList.id !== toList.id && toList.tasks.length > 0) {
       const oldIndexTask = fromList.tasks.findIndex(
         (task) => task.id === activeTaskId
       );
@@ -105,7 +125,42 @@ export const Home = () => {
         (task) => task.id === overTaskId
       );
 
-      actions.sortTasks(fromList.id, toList.id, oldIndexTask, newIndexTask);
+      const [movedTask] = fromList.tasks.splice(oldIndexTask, 1);
+
+      movedTask.list_id = toList.id;
+      toList.tasks.splice(newIndexTask, 0, movedTask);
+
+      fromList.tasks.forEach((task, index) => (task.position = index));
+      toList.tasks.forEach((task, index) => (task.position = index));
+
+      actions.moveTaskToAnotherList(
+        fromList.id,
+        toList.id,
+        fromList.tasks,
+        toList.tasks
+      );
+    }
+
+    // Mover a una lista vacía
+    else if (fromList.id !== toList.id && toList.tasks.length === 0) {
+      console.log("Moving to an empty list");
+      const oldIndexTask = fromList.tasks.findIndex(
+        (task) => task.id === activeTaskId
+      );
+      const [movedTask] = fromList.tasks.splice(oldIndexTask, 1);
+
+      movedTask.list_id = toList.id;
+      movedTask.position = 0;
+      toList.tasks.push(movedTask);
+
+      fromList.tasks.forEach((task, index) => (task.position = index));
+
+      actions.moveTaskToAnotherList(
+        fromList.id,
+        toList.id,
+        fromList.tasks,
+        toList.tasks
+      );
     }
   };
 

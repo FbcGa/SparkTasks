@@ -223,39 +223,104 @@ const getState = ({ getStore, getActions, setStore }) => {
         return data;
       },
       /*----sort list---------------*/
-      sortLists: (newOrder) => {
+      sortLists: async (newOrder) => {
         setStore({ list: newOrder });
-        console.log(newOrder);
-        ///aqui debe ir la logica para modificar el orden de las listas
-      },
-      sortTasks: (fromListId, toListId, oldIndexTask, newIndexTask) => {
-        const store = getStore();
-        const updatedLists = structuredClone(store.list);
+        const token = localStorage.getItem("token");
+        const listOrder = newOrder.map((list) => list.id);
 
-        // Encontrar las listas de origen y destino
-        const fromList = updatedLists.find((list) => list.id === fromListId);
-        const toList = updatedLists.find((list) => list.id === toListId);
-
-        // Validar que ambas listas existan
-        if (!fromList || !toList) {
-          console.error("No se encontró la lista de origen o destino");
-          return;
-        }
-
-        if (fromListId === toListId) {
-          // Reordenamiento dentro de la misma lista
-          fromList.tasks = arrayMove(
-            fromList.tasks,
-            oldIndexTask,
-            newIndexTask
+        try {
+          const resp = await fetch(
+            process.env.BACKEND_URL + "/api/list/reorder",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ new_order: listOrder }),
+            }
           );
-        } else {
-          // Mover la tarea a otra lista
-          const [movedTask] = fromList.tasks.splice(oldIndexTask, 1); // Remover de origen
-          toList.tasks.splice(newIndexTask, 0, movedTask); // Insertar en el destino
-        }
 
-        setStore({ list: updatedLists });
+          if (!resp.ok) {
+            console.error("Error al reordenar las listas en el backend");
+            return false;
+          }
+        } catch (error) {
+          console.error("Error al reordenar listas:", error);
+        }
+      },
+      sortTaskWithinList: async (listId, updatedTasks) => {
+        const token = localStorage.getItem("token");
+
+        try {
+          const resp = await fetch(
+            `${process.env.BACKEND_URL}/api/tasks/reorder`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                list_id: listId,
+                ordered_task_ids: updatedTasks.map((task) => task.id),
+              }),
+            }
+          );
+
+          if (!resp.ok) {
+            console.error("Error al reordenar las tareas en el backend");
+            return;
+          }
+
+          // Actualizar el estado local después de la confirmación del backend
+          const store = getStore();
+          const updatedLists = structuredClone(store.list);
+          const targetList = updatedLists.find((list) => list.id === listId);
+
+          if (targetList) {
+            targetList.tasks = updatedTasks; // Reemplazar con la versión reordenada
+            setStore({ list: updatedLists });
+          }
+        } catch (error) {
+          console.error("Error al reordenar tareas:", error);
+        }
+      },
+      moveTaskToAnotherList: async (
+        fromListId,
+        toListId,
+        updatedFromTasks,
+        updatedToTasks
+      ) => {
+        const token = localStorage.getItem("token");
+
+        try {
+          const resp = await fetch(process.env.BACKEND_URL + "/api/task/move", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              fromListId,
+              toListId,
+              updatedFromTasks,
+              updatedToTasks,
+            }),
+          });
+
+          if (!resp.ok) {
+            console.error("Error al mover la tarea en el backend");
+            return;
+          }
+
+          const data = await resp.json();
+          console.log("Tarea movida con éxito:", data);
+          // Actualizar el estado local si es necesario
+          setStore({ list: data.updatedLists });
+        } catch (error) {
+          console.error("Error al mover la tarea:", error);
+        }
       },
     },
   };
