@@ -171,6 +171,17 @@ export const Home = () => {
 
   useAuth();
 
+  if (store.list.length === 0) {
+    return (
+      <div className="empty-list-container">
+        <p className="empty-list-message">
+          Start by creating a list to organize your tasks!
+        </p>
+        <AddThings textItem="List" />
+      </div>
+    );
+  }
+
   return (
     <DndContext
       sensors={sensors}

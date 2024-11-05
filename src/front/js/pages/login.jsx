@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef, useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -7,14 +7,18 @@ export function Login() {
   const { actions } = useContext(Context);
   const emailRef = useRef();
   const passwordRef = useRef();
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
     const resp = await actions.login(email, password);
+
     if (resp) {
       navigate("/");
+    } else {
+      setError("The provided credentials are incorrect..");
     }
   };
 
@@ -32,10 +36,18 @@ export function Login() {
             ref={emailRef}
             className="input-field"
             placeholder="Enter your email"
+            required
           />
-          <div className="form-text">
-            We'll never share your email with anyone else.
-          </div>
+
+          {error ? (
+            <div className="error">
+              <p>{error}</p>
+            </div>
+          ) : (
+            <div className="form-text">
+              We'll never share your email with anyone else.
+            </div>
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="password" className="form-label">
@@ -47,6 +59,7 @@ export function Login() {
             ref={passwordRef}
             className="input-field"
             placeholder="Enter your password"
+            required
           />
         </div>
         <button type="submit" className="submit-button">
