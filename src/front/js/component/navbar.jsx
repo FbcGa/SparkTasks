@@ -13,7 +13,7 @@ export const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-md navbar-dark">
       <Link className="navbar-brand ms-3" to="/">
-        <span>Trello</span>
+        <span>SparkTasks </span>
       </Link>
       <button
         className="navbar-toggler"

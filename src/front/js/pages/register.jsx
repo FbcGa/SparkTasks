@@ -31,6 +31,7 @@ export function Register() {
             ref={emailRef}
             className="input-field"
             placeholder="Enter your email"
+            required
           />
           <div className="form-text">
             We'll never share your email with anyone else.
@@ -46,6 +47,7 @@ export function Register() {
             ref={passwordRef}
             className="input-field"
             placeholder="Enter your password"
+            required
           />
         </div>
         <button type="submit" className="submit-button">
