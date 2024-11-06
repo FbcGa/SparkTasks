@@ -87,8 +87,9 @@ export function SortableList({ list }) {
           <SortableTask task={task} key={task.id} listId={list.id} />
         ))}
       </SortableContext>
-
-      <AddThings textItem="Task" id={list.id} />
+      <div className="add-margin">
+        <AddThings textItem="Task" id={list.id} />
+      </div>
     </li>
   );
 }
