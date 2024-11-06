@@ -1,5 +1,6 @@
 import React, { useState, useRef, useContext } from "react";
 import { Context } from "../store/appContext";
+import { Plus } from "lucide-react";
 
 export function AddThings({ textItem, id }) {
   const { actions } = useContext(Context);
@@ -45,7 +46,7 @@ export function AddThings({ textItem, id }) {
         </div>
       ) : (
         <button className="toggle-button" onClick={() => setItem(true)}>
-          <i className="fa-solid fa-plus"></i>
+          <Plus />
           <span>Add a {textItem}</span>
         </button>
       )}
