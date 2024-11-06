@@ -4,7 +4,7 @@ import { AddThings } from "./addThings.jsx";
 import { Context } from "../store/appContext";
 import { useSortable, SortableContext } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 export function SortableList({ list }) {
   const { actions } = useContext(Context);
@@ -87,7 +87,7 @@ export function SortableList({ list }) {
           <SortableTask task={task} key={task.id} listId={list.id} />
         ))}
       </SortableContext>
-      <div className="add-margin">
+      <div style={{ marginTop: "20px" }}>
         <AddThings textItem="Task" id={list.id} />
       </div>
     </li>

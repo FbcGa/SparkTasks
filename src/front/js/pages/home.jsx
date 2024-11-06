@@ -143,7 +143,6 @@ export const Home = () => {
 
     // Mover a una lista vacía
     else if (fromList.id !== toList.id && toList.tasks.length === 0) {
-      console.log("Moving to an empty list");
       const oldIndexTask = fromList.tasks.findIndex(
         (task) => task.id === activeTaskId
       );
@@ -183,31 +182,34 @@ export const Home = () => {
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
-    >
-      <main className="home-container">
-        <SortableContext items={ColumnList}>
-          <ul className="list-container">
-            {store.list?.map((list) => (
-              <SortableList list={list} key={list.id} />
-            ))}
-          </ul>
-        </SortableContext>
-
+    <main className="main-container">
+      <div className="add-margin">
         <AddThings textItem="List" />
+      </div>
+      <DndContext
+        sensors={sensors}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+      >
+        <section className="home-container">
+          <SortableContext items={ColumnList}>
+            <ul className="list-container">
+              {store.list?.map((list) => (
+                <SortableList list={list} key={list.id} />
+              ))}
+            </ul>
+          </SortableContext>
 
-        {createPortal(
-          <DragOverlay>
-            {activeList && <SortableList list={activeList} />}
-            {activeTask && <TaskOverlay task={activeTask} />}
-          </DragOverlay>,
-          document.body
-        )}
-      </main>
-    </DndContext>
+          {createPortal(
+            <DragOverlay>
+              {activeList && <SortableList list={activeList} />}
+              {activeTask && <TaskOverlay task={activeTask} />}
+            </DragOverlay>,
+            document.body
+          )}
+        </section>
+      </DndContext>
+    </main>
   );
 };
