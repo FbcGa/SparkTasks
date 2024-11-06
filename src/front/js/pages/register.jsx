@@ -1,9 +1,10 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef, useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { Link, useNavigate } from "react-router-dom";
 
 export function Register() {
   const { actions } = useContext(Context);
+  const [error, setError] = useState(false);
   const emailRef = useRef();
   const passwordRef = useRef();
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ export function Register() {
     const resp = await actions.register(email, password);
     if (resp) {
       navigate("/");
+    } else {
+      setError("this email is already in use");
     }
   };
   return (
@@ -33,9 +36,15 @@ export function Register() {
             placeholder="Enter your email"
             required
           />
-          <div className="form-text">
-            We'll never share your email with anyone else.
-          </div>
+          {error ? (
+            <div className="error">
+              <p>{error}</p>
+            </div>
+          ) : (
+            <div className="form-text">
+              We'll never share your email with anyone else.
+            </div>
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="password" className="form-label">

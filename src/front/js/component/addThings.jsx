@@ -1,5 +1,6 @@
 import React, { useState, useRef, useContext } from "react";
 import { Context } from "../store/appContext";
+import { Plus } from "lucide-react";
 
 export function AddThings({ textItem, id }) {
   const { actions } = useContext(Context);
@@ -30,23 +31,20 @@ export function AddThings({ textItem, id }) {
   return (
     <section className="add-things-container">
       {item ? (
-        <div className="input-container">
+        <div className="input-container" onClick={handleAddItem}>
           <textarea
             className="text-input"
             ref={addRef}
-            placeholder={`Write a ${textItem} title`}
+            placeholder={`Write a new ${textItem}`}
             onKeyDown={handleKeyDown}
             autoFocus
+            onBlur={() => setItem(false)}
           ></textarea>
-          <button onClick={handleAddItem} className="add-button">
-            <i className="fa-solid fa-plus"></i>
-            <span>Add a {textItem}</span>
-          </button>
         </div>
       ) : (
         <button className="toggle-button" onClick={() => setItem(true)}>
-          <i className="fa-solid fa-plus"></i>
-          <span>Add a {textItem}</span>
+          <Plus />
+          <span>Add</span>
         </button>
       )}
     </section>

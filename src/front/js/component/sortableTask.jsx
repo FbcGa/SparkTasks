@@ -2,6 +2,7 @@ import React, { useContext, useRef, useState } from "react";
 import { Context } from "../store/appContext";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Trash2 } from "lucide-react";
 
 export function SortableTask({ task, listId }) {
   const { actions } = useContext(Context);
@@ -88,7 +89,7 @@ export function SortableTask({ task, listId }) {
         onClick={() => deleteTask(task.id, listId)}
         className="task-delete-button"
       >
-        <i className="fa-solid fa-trash"></i>
+        <Trash2 size={16} />
       </button>
     </div>
   );

@@ -4,6 +4,7 @@ import { AddThings } from "./addThings.jsx";
 import { Context } from "../store/appContext";
 import { useSortable, SortableContext } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Plus, Trash2 } from "lucide-react";
 
 export function SortableList({ list }) {
   const { actions } = useContext(Context);
@@ -76,7 +77,7 @@ export function SortableList({ list }) {
             onClick={() => deleteList(list.id)}
             className="delete-button"
           >
-            <i className="fa-solid fa-trash"></i>
+            <Trash2 />
           </button>
         </div>
       </div>
@@ -86,8 +87,7 @@ export function SortableList({ list }) {
           <SortableTask task={task} key={task.id} listId={list.id} />
         ))}
       </SortableContext>
-
-      <div className="add-task-container">
+      <div style={{ marginTop: "20px" }}>
         <AddThings textItem="Task" id={list.id} />
       </div>
     </li>
